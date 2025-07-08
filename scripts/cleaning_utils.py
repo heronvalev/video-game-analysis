@@ -15,12 +15,14 @@ class SteamDataCleaner:
         """
         self.df = df.copy()
     
+    # Return self with the following methods to allow method chaining
+
     def standardise_columns(self):
         """
         Convert column names to lowercase, strip whitespace, and replace spaces with underscores.
         
         Returns:
-        self: Enables method chaining.
+        self
         """
         self.df.columns = self.df.columns.str.strip().str.lower().str.replace(' ', '_')
         return self
@@ -30,56 +32,70 @@ class SteamDataCleaner:
         Remove duplicate rows from the dataframe in-place.
         
         Returns:
-        self: Enables method chaining.
+        self
         """
         self.df.drop_duplicates(inplace=True)
         return self
     
-    def fill_missing(self, column, value='Unknown'):
+    def fill_missing(self, columns, value='Unknown'):
         """
-        Fill missing values in a specified column with a given value.
+        Fill missing values in one or more columns in a df with a given value.
         
         Parameters:
-        column (str): Column to fill missing values in.
+        columns (str or list): Column(s) to fill missing values in.
         value (str): Value to replace missing entries with. Default is 'Unknown'.
         
         Returns:
-        self: Enables method chaining.
+        self
         """
-        if column in self.df.columns:
-            self.df[column] = self.df[column].fillna(value)
+        # Convert single-column str value to a list to pass to the method
+        if isinstance(columns, str):
+            columns = [columns]
+        
+        # Apply changes to all columns specified
+        for column in columns:
+            if column in self.df.columns:
+                self.df[column] = self.df[column].fillna(value)
+
         return self
 
-    def clean_text_column(self, column):
+    def clean_text_column(self, columns):
         """
-        Normalize text in a specified column: strip whitespace, remove newlines, and convert to lowercase.
+        Clean text in one or more columns: strip whitespace, remove newlines, and convert to lowercase.
         
         Parameters:
-        column (str): The column to clean text values for.
+        column (str or list): The column(s) to clean text values for.
         
         Returns:
-        self: Enables method chaining.
+        self
         """
-        if column in self.df.columns:
-            self.df[column] = (
-                self.df[column]
-                .astype(str)
-                .str.strip()
-                .str.replace('\n', ' ')
-                .str.lower()
-            )
+        if isinstance(columns, str):
+            columns = [columns]
+        
+        for column in columns:
+            if column in self.df.columns:
+                self.df[column] = (
+                    self.df[column]
+                    .astype(str)
+                    .str.strip()
+                    .str.replace('\n', ' ')
+                    .str.lower()
+                )
+                
         return self
 
-    def remove_html_from_column(self, column):
+    def remove_html_from_column(self, columns):
         """
-        Strip HTML tags from a specified column using BeautifulSoup.
+        Strip HTML tags from one or more columns using BeautifulSoup.
 
         Parameters:
-        column (str): Name of the column containing HTML content.
+        column (str or list): Column(s) containing HTML content.
 
         Returns:
         self
         """
+        if isinstance(columns, str):
+            columns = [columns]
 
         def strip_html(text):
             """
@@ -90,39 +106,50 @@ class SteamDataCleaner:
             
             # Extract text content, remove tags, and clean whitespace
             return soup.get_text(separator=' ', strip=True)
-
-        if column in self.df.columns:
-            # Apply the strip_html function to each cell in the column
-            self.df[column] = self.df[column].apply(strip_html)
+        
+        for column in columns:
+            if column in self.df.columns:
+                # Apply the strip_html function to each cell in the column
+                self.df[column] = self.df[column].apply(strip_html)
 
         return self
     
-    def convert_to_numeric(self, column):
+    def convert_to_numeric(self, columns):
         """
-        Convert a column to numeric, coercing errors and filling NaNs with zero.
+        Convert one or more columns to numeric, coercing errors and filling NaNs with zero.
         
         Parameters:
-        column (str): The column to convert.
+        column (str or list): The column to convert.
         
         Returns:
-        self: Enables method chaining.
+        self
         """
-        if column in self.df.columns:
-            self.df[column] = pd.to_numeric(self.df[column], errors='coerce').fillna(0)
+        if isinstance(columns, str):
+            columns = [columns]
+
+        for column in columns:
+            if column in self.df.columns:
+                self.df[column] = pd.to_numeric(self.df[column], errors='coerce').fillna(0)
+
         return self
     
-    def convert_to_datetime(self, column):
+    def convert_to_datetime(self, columns):
         """
-        Convert a column to datetime format, coercing errors.
+        Convert one or more columns to datetime format, coercing errors.
         
         Parameters:
-        column (str): The column to convert.
+        column (str or list): The column to convert.
         
         Returns:
-        self: Enables method chaining.
+        self
         """
-        if column in self.df.columns:
-            self.df[column] = pd.to_datetime(self.df[column], errors='coerce')
+        if isinstance(columns, str):
+            columns = [columns]
+
+        for column in columns:
+            if column in self.df.columns:
+                self.df[column] = pd.to_datetime(self.df[column], errors='coerce')
+
         return self
 
     def get_df(self):
