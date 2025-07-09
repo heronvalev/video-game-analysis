@@ -14,6 +14,7 @@ class SteamDataCleaner:
         df (pd.DataFrame): The raw dataframe to be cleaned.
         """
         self.df = df.copy()
+        self.log = []
     
     # Return self with the following methods to allow method chaining
 
@@ -29,12 +30,19 @@ class SteamDataCleaner:
     
     def drop_duplicates(self):
         """
-        Remove duplicate rows from the dataframe in-place.
+        Remove duplicate rows from the dataframe in-place and log the number removed.
         
         Returns:
         self
         """
+        before = len(self.df)
         self.df.drop_duplicates(inplace=True)
+        after = len(self.df)
+        dropped = before - after
+
+        if dropped > 0:
+            self.log.append(f"Dropped {dropped} duplicate rows.")
+
         return self
     
     def fill_missing(self, columns, value='Unknown'):
@@ -55,7 +63,13 @@ class SteamDataCleaner:
         # Apply changes to all columns specified
         for column in columns:
             if column in self.df.columns:
+                before = self.df[column].isna().sum()
                 self.df[column] = self.df[column].fillna(value)
+                filled = before - self.df[column].isna().sum()
+
+                # Log any changes made
+                if filled > 0:
+                    self.log.append(f"Filled {filled} missing values in '{column}' with '{value}'.")
 
         return self
 
@@ -74,13 +88,17 @@ class SteamDataCleaner:
         
         for column in columns:
             if column in self.df.columns:
-                self.df[column] = (
+                before = self.df[column].copy()
+                cleaned = (
                     self.df[column]
                     .astype(str)
                     .str.strip()
-                    .str.replace('\n', ' ')
+                    .str.replace('\n', ' ', regex = False)
                     .str.lower()
                 )
+                changed = (cleaned != before).sum()
+                if changed > 0:
+                    self.log.append(f"Cleaned text in '{column}': {changed} rows affected.")
                 
         return self
 
@@ -110,7 +128,11 @@ class SteamDataCleaner:
         for column in columns:
             if column in self.df.columns:
                 # Apply the strip_html function to each cell in the column
-                self.df[column] = self.df[column].apply(strip_html)
+                before = self.df[column].copy()
+                stripped = self.df[column].apply(strip_html)
+                changed = (stripped != before).sum()
+                if changed > 0:
+                    self.log.append(f"Removed HTML from '{column}': {changed} rows cleaned.")
 
         return self
     
@@ -119,7 +141,7 @@ class SteamDataCleaner:
         Convert one or more columns to numeric, coercing errors and filling NaNs with zero.
         
         Parameters:
-        column (str or list): The column to convert.
+        column (str or list): The column(s) to convert.
         
         Returns:
         self
@@ -129,7 +151,15 @@ class SteamDataCleaner:
 
         for column in columns:
             if column in self.df.columns:
-                self.df[column] = pd.to_numeric(self.df[column], errors='coerce').fillna(0)
+                # Coerce to numeric - invalid entries become NaN
+                converted = pd.to_numeric(self.df[column], errors='coerce')
+                new_nans = converted.isna().sum()
+
+                # Replace NaNs with 0 and assign back to original DataFrame
+                self.df[column] = converted.fillna(0)
+
+                if new_nans > 0:
+                    self.log.append(f"Converted '{column}' to numeric: {new_nans} entries replaced with 0.")
 
         return self
     
@@ -138,7 +168,7 @@ class SteamDataCleaner:
         Convert one or more columns to datetime format, coercing errors.
         
         Parameters:
-        column (str or list): The column to convert.
+        column (str or list): The column(s) to convert.
         
         Returns:
         self
@@ -148,7 +178,22 @@ class SteamDataCleaner:
 
         for column in columns:
             if column in self.df.columns:
-                self.df[column] = pd.to_datetime(self.df[column], errors='coerce')
+                # Count missing values before conversion
+                missing_before = self.df[column].isna().sum()
+
+                # Convert to datetime - invalid values become NaT
+                converted = pd.to_datetime(self.df[column], errors='coerce')
+
+                # Count new NaT values introduced by failed conversions
+                missing_after = converted.isna().sum()
+                new_nats = missing_after - missing_before
+
+                # Assign converted column back to the DataFrame
+                self.df[column] = converted
+
+                if new_nats > 0:
+                    self.log.append(f"Converted '{column}' to datetime: {new_nats} entries became NaT.")
+
 
         return self
 
@@ -160,3 +205,27 @@ class SteamDataCleaner:
         pd.DataFrame: The cleaned dataframe.
         """
         return self.df
+    
+    def get_log(self):
+        """
+        Retrieve the log of cleaning performed.
+
+        Returns:
+        list: A list of all data cleaning transformations.
+        """
+        return self.log
+    
+    def print_log_summary(self):
+        """
+        Print a formatted summary of all logged cleaning actions.
+
+        Outputs:
+        Console printout of each log entry.
+        """
+        print("\n Cleaning Summary:")
+        for entry in self.log:
+            print(f"• {entry}")
+
+cleaner = SteamDataCleaner
+cleaner.print_log_summary
+print
