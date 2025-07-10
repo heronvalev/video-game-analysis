@@ -71,3 +71,19 @@ for df_name, df in dataframes.items():
 
 # save_cleaned_csv(clean_df, 'steam_description_data_cleaned.csv')
 
+cleaner_steam = SteamDataCleaner(dataframes["steam"])
+list_of_columns = cleaner_steam.df.columns.values.tolist()
+
+# clean_df_object = (
+#     cleaner_steam
+#     .standardise_columns()
+#     .drop_duplicates()
+#     .fill_missing(list_of_columns)
+#     .clean_text_column(['name', 'developer', 'publisher', 'platforms', 'categories', 'genres', 'steamspy_tags'])
+#     .convert_to_numeric(['english', 'required_age', 'achievements', 'positive_ratings', 'negative_ratings', 'average_playtime', 'median_playtime', 'price'])
+#     .convert_to_datetime('release_date')
+# )
+# clean_df_object.print_log_summary()
+# clean_df = clean_df_object.get_df()
+
+# save_cleaned_csv(clean_df, 'steam_data_cleaned.csv')
