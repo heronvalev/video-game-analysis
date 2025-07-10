@@ -55,6 +55,7 @@ for df_name, df in dataframes.items():
 
 # Use the SteamDataCleaner class to clean the 4 DataFrame objects and comment them out once executed
 
+
 # cleaner_description = SteamDataCleaner(dataframes["steam_description_data"])
 
 # clean_df = (
@@ -69,10 +70,12 @@ for df_name, df in dataframes.items():
 # columns_to_drop = ["detailed_description", "about_the_game"]
 # clean_df.drop(columns=columns_to_drop, axis="columns", inplace=True)
 
+
+
 # save_cleaned_csv(clean_df, 'steam_description_data_cleaned.csv')
 
-cleaner_steam = SteamDataCleaner(dataframes["steam"])
-list_of_columns = cleaner_steam.df.columns.values.tolist()
+# cleaner_steam = SteamDataCleaner(dataframes["steam"])
+# list_of_columns = cleaner_steam.df.columns.values.tolist()
 
 # clean_df_object = (
 #     cleaner_steam
@@ -87,3 +90,39 @@ list_of_columns = cleaner_steam.df.columns.values.tolist()
 # clean_df = clean_df_object.get_df()
 
 # save_cleaned_csv(clean_df, 'steam_data_cleaned.csv')
+
+
+
+# cleaner_media = SteamDataCleaner(dataframes["steam_media_data"])
+
+# clean_df_object = (
+#     cleaner_media
+#     .standardise_columns()
+#     .drop_duplicates()
+# )
+
+# clean_df_object.print_log_summary()
+# clean_df = clean_df_object.get_df()
+
+# columns_to_drop = ['screenshots', 'background', 'movies']
+# clean_df.drop(columns=columns_to_drop, axis="columns", inplace=True)
+
+# save_cleaned_csv(clean_df, 'steam_media_cleaned.csv')
+
+
+# cleaner_steamspy_tag = SteamDataCleaner(dataframes["steamspy_tag_data"])
+
+# list_of_all_columns = cleaner_steamspy_tag.df.columns.values.tolist()
+# list_of_columns = list_of_all_columns[1:] #removing the app_id column from the list as it is the main identifier
+
+# clean_df_object = (
+#     cleaner_steamspy_tag
+#     .fill_missing(columns=list_of_columns)
+#     .convert_to_numeric(columns=list_of_columns)
+# )
+
+# clean_df_object.print_log_summary()
+# clean_df = clean_df_object.get_df()
+
+# save_cleaned_csv(clean_df,'steamspy_tag_data_cleaned.csv')
+
