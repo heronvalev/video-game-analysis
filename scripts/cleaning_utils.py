@@ -226,6 +226,3 @@ class SteamDataCleaner:
         for entry in self.log:
             print(f"• {entry}")
 
-cleaner = SteamDataCleaner
-cleaner.print_log_summary
-print
