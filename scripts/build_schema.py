@@ -27,7 +27,9 @@ metadata_df["genres_list"] = metadata_df["genres"].apply(split_string)
 
 metadata_df["platforms_list"] = metadata_df["platforms"].apply(split_string)
 
-# Collect all unique category names across games
+metadata_df["steamspy_tags_list"] = metadata_df["steamspy_tags"].apply(split_string)
+
+# Collect all unique values across games
 all_categories = set()
 
 for categories in metadata_df["categories_list"]:
@@ -36,7 +38,7 @@ for categories in metadata_df["categories_list"]:
         if cat:
             all_categories.add(cat)
 
-# Repeat the latter for unique genres accross games
+
 all_genres = set()
 
 for genres in metadata_df["genres_list"]:
@@ -45,7 +47,7 @@ for genres in metadata_df["genres_list"]:
         if genre:
             all_genres.add(genre)
 
-# Repeat the latter for each game platform
+
 all_platforms = set()
 
 for plats in metadata_df["platforms_list"]:
@@ -54,34 +56,45 @@ for plats in metadata_df["platforms_list"]:
         if p:
             all_platforms.add(p)
 
-# Create a lookup dictionary: category name to numeric ID
+all_tags = set()
+
+for tags in metadata_df["steamspy_tags_list"]:
+    for tag in tags:
+        tag = tag.strip()
+        if tag:
+            all_tags.add(tag)
+
+# Create a lookup dictionary: value name to numeric ID
 category_to_id = {name: idx + 1 for idx, name in enumerate(sorted(all_categories))}
 
-# Create a lookup dictionary: genre name to numeric ID
 genre_to_id = {name: idx + 1 for idx, name in enumerate(sorted(all_genres))}
 
-# Create a lookup dictionary: platform name to numeric ID
 platform_to_id = {name: idx + 1 for idx, name in enumerate(sorted(all_platforms))}
 
-# Convert the category lookup dictionary into a DataFrame for export
+tag_to_id = {name: idx + 1 for idx, name in enumerate(sorted(all_tags))}
+
+# Convert the lookup dictionaries into a DataFrames for export
 categories_df = pd.DataFrame([
     {"category_id": cid, "category_name": name}
     for name, cid in category_to_id.items()
 ])
 
-# Repeat the latter for the genre lookup dictionary
 genres_df = pd.DataFrame([
     {"genre_id": gid, "genre_name": name}
     for name, gid in genre_to_id.items()
 ])
 
-# Repeat the latter for the platform lookup dictionary
 platforms_df = pd.DataFrame([
     {"platform_id": pid, "platform_name": name}
     for name, pid in platform_to_id.items()
 ])
 
-# Construct the many-to-many junction table linking each game to its category IDs
+tags_df = pd.DataFrame([
+    {"tag_id": tid, "tag_name": name}
+    for name, tid in tag_to_id.items()
+])
+
+# Construct the many-to-many junction tables linking each game to its category, genre, platform and tag IDs
 game_categories_records = []
 
 for _, row in metadata_df.iterrows():
@@ -97,7 +110,7 @@ game_categories_df = pd.DataFrame(
     columns=["appid", "category_id"]
 )
 
-# Repeat the latter for each game to its genre IDs
+
 game_genres_records = []
 
 for _, row in metadata_df.iterrows():
@@ -113,7 +126,7 @@ game_genres_df = pd.DataFrame(
     columns=["appid", "genre_id"]
 )
 
-# Repeat the latter for each platform to its platform IDs
+
 game_platforms_records = []
 
 for _, row in metadata_df.iterrows():
@@ -127,6 +140,22 @@ for _, row in metadata_df.iterrows():
 game_platforms_df = pd.DataFrame(
     game_platforms_records,
     columns=["appid", "platform_id"]
+)
+
+
+game_tags_records = []
+
+for _, row in metadata_df.iterrows():
+    appid = row["appid"]
+    for tag in row["steamspy_tags_list"]:
+        tag = tag.strip()
+        if tag:
+            t_id = tag_to_id[tag]
+            game_tags_records.append((appid, t_id))
+
+game_steamspy_tags_df = pd.DataFrame(
+    game_tags_records,
+    columns=["appid", "steamspy_tag_id"]
 )
 
 # Merge description into metadata using matching game IDs
@@ -173,6 +202,9 @@ game_genres_df.to_sql("game_genres", conn, index=False, if_exists="replace")
 
 platforms_df.to_sql("platforms", conn, index=False, if_exists="replace")
 game_platforms_df.to_sql("game_platforms", conn, index=False, if_exists="replace")
+
+tags_df.to_sql("steamspy_tags", conn, index=False, if_exists="replace")
+game_steamspy_tags_df.to_sql("game_steamspy_tags", conn, index=False, if_exists="replace")
 
 
 conn.close()
