@@ -142,6 +142,7 @@ games_df = games_df[[
     "release_date",
     "developer",
     "publisher",
+    "english",
     "short_description",
     "price"
 ]]
