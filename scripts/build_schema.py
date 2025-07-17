@@ -10,11 +10,14 @@ DB_PATH = os.path.normpath(os.path.join(SCRIPT_DIR, "..", "data", "steam.sqlite"
 # Specify input files for cleaned metadata and game descriptions
 metadata_file = os.path.normpath(os.path.join(DATA_DIR, "steam_data_cleaned.csv"))
 descr_file = os.path.normpath(os.path.join(DATA_DIR, "steam_description_data_cleaned.csv"))
+votes_file = os.path.normpath(os.path.join(DATA_DIR, "steamspy_tag_data_cleaned.csv"))
 
 # Load CSVs into DataFrames
 metadata_df = pd.read_csv(metadata_file)
 descr_df = pd.read_csv(descr_file)
+votes_df = pd.read_csv(votes_file)
 
+# Create a function to split semicolon-delimited strings
 def split_string(str_to_split):
     if pd.isna(str_to_split):
         return []
@@ -55,14 +58,19 @@ for plats in metadata_df["platforms_list"]:
         p = p.strip()
         if p:
             all_platforms.add(p)
-
-all_tags = set()
-
+## Tags from semicolon-separated steamspy_tags column
+metadata_tags = set()
 for tags in metadata_df["steamspy_tags_list"]:
     for tag in tags:
         tag = tag.strip()
         if tag:
-            all_tags.add(tag)
+            metadata_tags.add(tag)
+
+## Tags from votes CSV (column names, excluding 'appid')
+csv_tags = set(votes_df.columns) - {"appid"}
+
+## Combine tags from both sources
+all_tags = metadata_tags.union(csv_tags)
 
 # Create a lookup dictionary: value name to numeric ID
 category_to_id = {name: idx + 1 for idx, name in enumerate(sorted(all_categories))}
@@ -187,6 +195,29 @@ ratings_df = metadata_df[[
     "required_age"
 ]]
 
+# Melt the wide votes_df into a long table df
+votes_long_df = votes_df.melt(
+    id_vars="appid",
+    var_name="tag_name",
+    value_name="vote_count"
+)
+# Drop entries where a game has 0 votes for a tag
+votes_nonzero_df = votes_long_df[votes_long_df["vote_count"] > 0]
+
+# Merge tags_df with votes_nonzero_df on "tag_name" column
+votes_with_id_df = votes_nonzero_df.merge(
+    tags_df,
+    on="tag_name",
+    how="left"
+)
+
+# Select final subset of columns for steamspy votes to export to SQLite
+steamspy_votes_df = votes_with_id_df[[
+    "appid", 
+    "tag_id", 
+    "vote_count"
+]]
+
 # Connect to database and export DataFrame as table
 conn = sqlite3.connect(DB_PATH)
 
@@ -206,5 +237,6 @@ game_platforms_df.to_sql("game_platforms", conn, index=False, if_exists="replace
 tags_df.to_sql("steamspy_tags", conn, index=False, if_exists="replace")
 game_steamspy_tags_df.to_sql("game_steamspy_tags", conn, index=False, if_exists="replace")
 
+steamspy_votes_df.to_sql("steamspy_tag_votes", conn, index=False, if_exists="replace")
 
 conn.close()
