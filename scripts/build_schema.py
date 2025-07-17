@@ -11,11 +11,13 @@ DB_PATH = os.path.normpath(os.path.join(SCRIPT_DIR, "..", "data", "steam.sqlite"
 metadata_file = os.path.normpath(os.path.join(DATA_DIR, "steam_data_cleaned.csv"))
 descr_file = os.path.normpath(os.path.join(DATA_DIR, "steam_description_data_cleaned.csv"))
 votes_file = os.path.normpath(os.path.join(DATA_DIR, "steamspy_tag_data_cleaned.csv"))
+media_file = os.path.join(DATA_DIR, "steam_media_cleaned.csv")
 
 # Load CSVs into DataFrames
 metadata_df = pd.read_csv(metadata_file)
 descr_df = pd.read_csv(descr_file)
 votes_df = pd.read_csv(votes_file)
+media_df = pd.read_csv(media_file)
 
 # Create a function to split semicolon-delimited strings
 def split_string(str_to_split):
@@ -238,5 +240,7 @@ tags_df.to_sql("steamspy_tags", conn, index=False, if_exists="replace")
 game_steamspy_tags_df.to_sql("game_steamspy_tags", conn, index=False, if_exists="replace")
 
 steamspy_votes_df.to_sql("steamspy_tag_votes", conn, index=False, if_exists="replace")
+
+media_df.to_sql("game_media", conn, index=False, if_exists="replace")
 
 conn.close()
