@@ -219,6 +219,8 @@ steamspy_votes_df = votes_with_id_df[[
     "tag_id", 
     "vote_count"
 ]]
+# Rename "steam_appid" column in media_df to "appid"
+media_df.rename(columns={"steam_appid": "appid"}, inplace=True)
 
 # Connect to database and export DataFrame as table
 conn = sqlite3.connect(DB_PATH)
