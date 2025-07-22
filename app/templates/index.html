@@ -43,16 +43,22 @@
                 <p class="text-warning">No results found.</p>
             </div>
         {% else %}
-            <div class="d-flex flex-column justify-content-center align-items-center" style="height: 70vh;">
-                <h1 class="mb-5 text-center display-4">Search for a Game</h1>
+            <div class="d-flex flex-column justify-content-center align-items-center text-center" style="min-height: 85vh;">
 
-                <form method="POST" class="w-50 pb-3">
-                    <div class="input-group">
-                        <input type="text" name="search" class="form-control" placeholder="Enter a keyword">
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </div>
-                </form>
+                <img src="{{ url_for('static', filename='images/controller_cropped.png') }}" alt="Game Controller Icon" style="width: 400px;" class="mb-4">
 
+                <h1 class="fw-bold display-4 mb-3">Discover Your Next<br>Favorite Game</h1>
+                <p class="lead text-light mb-4">
+                    Explore timeless classics, indie gems, and more.<br>
+                    Enter a keyword to begin your search.
+                </p>
+
+                <div class="form-wrapper">
+                    <form method="POST" class="d-flex">
+                        <input type="text" name="search" class="form-control" placeholder="Search games...">
+                        <button type="submit" class="btn btn-success">Search</button>
+                    </form>
+                </div>
             </div>
         {% endif %} 
     {% endif %}
