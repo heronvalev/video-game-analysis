@@ -9,14 +9,14 @@
             <form method="POST" class="mb-4">
                 <div class="input-group">
                     <input type="text" name="search" class="form-control" placeholder="Enter a keyword">
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn btn-success">Search</button>
                 </div>
             </form>           
                 <h2 class="mb-3">Search Results:</h2>
                 <div class="row">
                     {% for game in results %}
-                        <div class="col-md-4 mb-4">
-                            <div class="card bg-secondary text-light h-100">
+                        <div class="col-sm-6 col-md-4 mb-4">
+                            <div class="card text-light h-100">
                                 <img src="{{ game.header_image }}" class="card-img-top" alt="{{ game.name }}">
                                 <div class="card-body">
                                     <h5 class="card-title">{{ game.name }}</h5>
@@ -30,17 +30,17 @@
         </div>
     {% else %}
         {% if req_method == "POST" %}
-            <div class="container py-5 text-center">
+            <div class="container py-5 d-flex flex-column align-items-center" style="min-height: 70vh;">
                 <h1 class="mb-4">Search for a Game</h1>
 
                 <form method="POST" class="w-50 mx-auto mb-4">
                     <div class="input-group">
                         <input type="text" name="search" class="form-control" placeholder="Enter a keyword">
-                        <button type="submit" class="btn btn-primary">Search</button>
+                        <button type="submit" class="btn btn-success">Search</button>
                     </div>
                 </form>
 
-                <p class="text-warning">No results found.</p>
+                <p class="no-results-message">No results found. Try a different keyword.</p>
             </div>
         {% else %}
             <div class="d-flex flex-column justify-content-center align-items-center text-center" style="min-height: 85vh;">

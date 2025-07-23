@@ -29,7 +29,24 @@ def query_games(search_term=""):
 def home():
     method = request.method
     game_list = []
+    transparent_navbar = True
+
     if request.method == "POST":
+
         query = request.form.get("search", "")
-        game_list = query_games(query)
-    return render_template("index.html", results=game_list, req_method=method, current_year=datetime.now().year)
+        raw_results = query_games(query)
+
+        # Format the release date from DB
+        formatted_results = []
+        for game in raw_results:
+            date_obj = datetime.strptime(game["release_date"], "%Y-%m-%d")
+            formatted_date = date_obj.strftime("%B %Y")
+
+            game_dict = dict(game)
+            game_dict["release_date"] = formatted_date
+            formatted_results.append(game_dict)
+        
+        game_list = formatted_results
+        transparent_navbar = False
+
+    return render_template("index.html", results=game_list, req_method=method, tr_navbar=transparent_navbar, current_year=datetime.now().year)
