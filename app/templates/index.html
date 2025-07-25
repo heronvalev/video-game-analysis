@@ -21,7 +21,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title">{{ game.name }}</h5>
                                     <p class="card-text">Released: {{ game.release_date }}</p>
-                                    <a href="#" class="btn btn-outline-light">View Details</a>
+                                    <a href="{{ url_for('game_details', appid=game.appid) }}" class="btn btn-outline-light">View Details</a>
                                 </div>
                             </div>
                         </div>
