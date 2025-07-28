@@ -132,3 +132,55 @@ input.form-control:focus {
     color: #bbbbbb;
     text-align: center;
 }
+
+.badge-lg {
+  font-size: 1rem;
+  padding: 0.35em 0.6em;
+  border-radius: 0.4rem;
+}
+
+.badge {
+  margin-bottom: 0.5rem;
+}
+
+h4 {
+  margin-bottom: 1rem;
+}
+
+.badge-genres {
+    background-color: #d97706;
+    color: white;
+}
+
+.badge-categories {
+    background-color: #16a34a;
+    color: white;
+}
+
+.badge-platforms {
+    background-color: #8b5cf6;
+    color: white;
+}
+
+.price-badge {
+  background-color: transparent;
+  color: #f8f9fa;
+  border: 1px solid #f8f9fa;
+  border-radius: 0.5rem;
+}
+
+.short-description {
+    font-size: 1.1rem;
+}
+
+.divider-line {
+  border: none;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+  margin: 2rem 0;
+  width: 100%;
+}
+
+.badge-steamspy {
+    background-color: #c49f00;
+    color: #f9f9f9;
+}
