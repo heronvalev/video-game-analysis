@@ -6,22 +6,36 @@ from datetime import datetime
 
 DB_PATH = os.path.join("data", "steam.sqlite")
 
-def query_games(search_term=""):
+def query_games(search_term="", limit=20, offset=0):
+    """
+Query games matching the search term, with pagination support.
+Returns a list of results and the total number of matches.
+"""
+
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
 
+    # Total number of matching results
+    cursor.execute("""
+        SELECT COUNT(*) FROM games
+        WHERE name LIKE ?
+    """, (f"%{search_term}%",))
+    total_count = cursor.fetchone()[0]
+    
+    # Basic game info query
     cursor.execute("""
         SELECT g.appid, g.name, g.release_date, gm.header_image
         FROM games g
         LEFT JOIN game_media gm ON g.appid = gm.appid
         WHERE g.name LIKE ?
-        LIMIT 20                   
-    """, (f"%{search_term}%",))
+        LIMIT ? OFFSET ?                   
+    """, (f"%{search_term}%", limit, offset))
 
     results = cursor.fetchall()
     conn.close()
-    return results
+
+    return results, total_count
 
     
 # Home Page
@@ -30,11 +44,25 @@ def home():
     method = request.method
     game_list = []
     transparent_navbar = True
+    search_term = ""
+    page = 1
+    per_page = 20
 
     if request.method == "POST":
 
-        query = request.form.get("search", "")
-        raw_results = query_games(query)
+        search_term = request.form.get("search", "")
+        page = 1
+
+    else:
+        search_term = request.args.get("search", "")
+        page = request.args.get("page", 1, type=int)
+
+    total_pages = 0
+
+    if search_term:
+
+        offset = (page - 1) * per_page
+        raw_results, total_count = query_games(search_term, limit=per_page, offset=offset)
 
         # Format the release date from DB
         formatted_results = []
@@ -45,11 +73,22 @@ def home():
             game_dict = dict(game)
             game_dict["release_date"] = formatted_date
             formatted_results.append(game_dict)
-        
+            
         game_list = formatted_results
-        transparent_navbar = False
+        total_pages = (total_count + per_page - 1) // per_page
+    
+    transparent_navbar = False if search_term else True
 
-    return render_template("index.html", results=game_list, req_method=method, tr_navbar=transparent_navbar, current_year=datetime.now().year)
+    return render_template(
+        "index.html", 
+        results=game_list, 
+        req_method=method, 
+        tr_navbar=transparent_navbar, 
+        current_year=datetime.now().year,
+        search_term=search_term,
+        current_page=page,
+        total_pages=total_pages
+    )
 
 # Game Details Page based on appid
 @app.route("/details/<int:appid>")
@@ -165,10 +204,12 @@ def game_details(appid):
     "required_age": required_age
     })
 
-    return render_template("details.html", 
-                           game=formatted_game,
-                           platforms=platforms,
-                           genres=genres,
-                           categories=categories,
-                           tags=steamspy_tags, 
-                           current_year = datetime.now().year)
+    return render_template(
+        "details.html", 
+        game=formatted_game,
+        platforms=platforms,
+        genres=genres,
+        categories=categories,
+        tags=steamspy_tags, 
+        current_year = datetime.now().year
+    )
