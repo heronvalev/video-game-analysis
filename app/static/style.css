@@ -217,3 +217,15 @@ h4 {
   gap: 0.6rem;
   justify-content: center;
 }
+
+a.badge {
+    text-decoration: none;
+}
+
+a.badge:hover {
+    filter: brightness(1.15);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+    text-decoration: none;
+}

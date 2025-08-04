@@ -213,3 +213,51 @@ def game_details(appid):
         tags=steamspy_tags, 
         current_year = datetime.now().year
     )
+
+# Extension to game_details: Browse games with a matching genre, category, platform or tag
+@app.route("/browse/<filter_type>/<filter_value>")
+def browse_by_filter(filter_type, filter_value):
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # Filter types and their corresponding tables/columns
+    valid_filters = {
+    "genre": ("genres", "genre_name", "game_genres", "genre_id"),
+    "category": ("categories", "category_name", "game_categories", "category_id"),
+    "platform": ("platforms", "platform_name", "game_platforms", "platform_id"),
+    "tag": ("steamspy_tags", "tag_name", "steamspy_tag_votes", "tag_id")
+    }
+
+    # If filter_type is not valid, show 404
+    if filter_type not in valid_filters:
+        return "Invalid filter", 404
+    
+
+    # Fetch table and column names based on the filter_type
+    table, name_col, link_table, link_col = valid_filters[filter_type]
+
+    # Query the DB using the above asigned names
+
+    cursor.execute(f"""
+        SELECT g.appid, g.name, g.release_date, gm.header_image
+        FROM games g
+        JOIN {link_table} l ON g.appid = l.appid
+        JOIN {table} t ON l.{link_col} = t.{link_col}
+        LEFT JOIN game_media gm ON g.appid = gm.appid
+        WHERE t.{name_col} = ?
+        LIMIT 50
+    """, (filter_value,))
+    
+    results = cursor.fetchall()
+    conn.close()
+
+    return render_template(
+        "browse.html",
+        results=results,
+        filter_type=filter_type,
+        filter_value=filter_value,
+        current_year = datetime.now().year
+    )
+
