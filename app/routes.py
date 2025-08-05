@@ -3,6 +3,7 @@ from flask import render_template, request
 import sqlite3
 import os
 from datetime import datetime
+from scripts.plot_utils import top_genres_chart, top_categories_chart, top_steamspy_tag_chart
 
 DB_PATH = os.path.join("data", "steam.sqlite")
 
@@ -261,3 +262,16 @@ def browse_by_filter(filter_type, filter_value):
         current_year = datetime.now().year
     )
 
+# Dashboard
+@app.route("/dashboard")
+def dashboard():
+    genres_chart = top_genres_chart(DB_PATH)
+    categories_chart = top_categories_chart(DB_PATH)
+    tags_chart = top_steamspy_tag_chart(DB_PATH)
+
+    return render_template(
+        "dashboard.html",
+        genres_chart=genres_chart,
+        categories_chart=categories_chart,
+        tags_chart=tags_chart
+    )

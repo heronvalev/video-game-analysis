@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title%}Dashboard{% endblock %}
+
+{% block content %}
+    <div class="container py-4">
+        <h1 class="mb-4">Dashboard</h1>
+
+        <div class="mb-5">
+            <h2>Top Genres</h2>
+            {{ genres_chart | safe }}
+        </div>
+
+        <div class="mb-5">
+            <h2>Top Categories</h2>
+            {{ categories_chart | safe }}
+        </div>
+
+        <div class="mb-5">
+            <h2>Top SteamSpy Tags</h2>
+            {{ tags_chart | safe }}
+        </div>
+    </div>
+{% endblock %}
