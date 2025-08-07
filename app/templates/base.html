@@ -20,7 +20,6 @@
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                     <li><a href="{{ url_for('home') }}" class="nav-link px-2">Home</a></li>
                     <li><a href="{{ url_for('dashboard') }}" class="nav-link px-2">Dashboard</a></li>
-                    <li><a href="#" class="nav-link px-2">Pricing</a></li>
                     <li><a href="#" class="nav-link px-2">About</a></li>
                 </ul>
 
@@ -39,8 +38,7 @@
         <footer class="py-3 my-4">
             <ul class="nav justify-content-center border-bottom pb-3 mb-3">
                 <li class="nav-item"><a href="{{ url_for('home') }}" class="nav-link px-2">Home</a></li>
-                <li class="nav-item"><a href="#" class="nav-link px-2">Features</a></li>
-                <li class="nav-item"><a href="#" class="nav-link px-2">Pricing</a></li>
+                <li><a href="{{ url_for('dashboard') }}" class="nav-link px-2">Dashboard</a></li>
                 <li class="nav-item"><a href="#" class="nav-link px-2">About</a></li>
             </ul>
             <p class="text-center">© {{ current_year }} Game Explorer. Built by Heron.</p>

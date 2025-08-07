@@ -3,7 +3,7 @@ from flask import render_template, request
 import sqlite3
 import os
 from datetime import datetime
-from scripts.plot_utils import top_genres_chart, top_categories_chart, top_steamspy_tag_chart
+from scripts.plot_utils import *
 
 DB_PATH = os.path.join("data", "steam.sqlite")
 
@@ -267,11 +267,21 @@ def browse_by_filter(filter_type, filter_value):
 def dashboard():
     genres_chart = top_genres_chart(DB_PATH)
     categories_chart = top_categories_chart(DB_PATH)
-    tags_chart = top_steamspy_tag_chart(DB_PATH)
+    tags_chart = top_steamspy_tags_chart(DB_PATH)
+    developers_chart = top_developers_chart(DB_PATH)
+    publishers_chart = top_publishers_chart(DB_PATH)
+    pricing_vs_playtime_tags_chart = pricing_vs_playtime_tag_chart(DB_PATH)
+    pricing_vs_rating_tags_chart = pricing_vs_rating_tag_chart(DB_PATH)
+    free_vs_paid_games_chart = free_vs_paid_chart(DB_PATH)
 
     return render_template(
         "dashboard.html",
         genres_chart=genres_chart,
         categories_chart=categories_chart,
-        tags_chart=tags_chart
+        tags_chart=tags_chart,
+        developers_chart=developers_chart,
+        publishers_chart=publishers_chart,
+        pricing_vs_playtime_tags_chart=pricing_vs_playtime_tags_chart,
+        pricing_vs_rating_tags_chart=pricing_vs_rating_tags_chart,
+        free_vs_paid_games_chart=free_vs_paid_games_chart
     )

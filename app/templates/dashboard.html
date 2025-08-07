@@ -3,21 +3,70 @@
 
 {% block content %}
     <div class="container py-4">
-        <h1 class="mb-4">Dashboard</h1>
+        <h1 class="mb-3 text-center">Explore Game Insights</h1>
+        <p class="mb-5 text-center">Dive into different aspects of the games dataset with charts and summaries.</p>
 
-        <div class="mb-5">
-            <h2>Top Genres</h2>
-            {{ genres_chart | safe }}
+        <h2 class="text-info mb-4 mt-5">Game Types</h2>
+        <div class="row mb-5">
+
+            <div class="col-md-6 mb-4">
+                <h5>Top Genres</h5>
+                {{ genres_chart | safe }}
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <h5>Top Categories</h5>
+                {{ categories_chart | safe }}
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <h5>Top SteamSpy Tags</h5>
+                {{ tags_chart | safe }}
+            </div>
+
         </div>
 
-        <div class="mb-5">
-            <h2>Top Categories</h2>
-            {{ categories_chart | safe }}
+        <hr class="divider-line">
+
+        <h2 class="text-info mb-4 mt-5">Companies</h2>
+        <div class="row mb-5">
+
+            <div class="col-md-6 mb-4">
+                <h5>Top Developers</h5>
+                {{ developers_chart | safe }}
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <h5>Top Publishers</h5>
+                {{ publishers_chart | safe }}
+            </div>
+
         </div>
 
-        <div class="mb-5">
-            <h2>Top SteamSpy Tags</h2>
-            {{ tags_chart | safe }}
+        <hr class="divider-line">
+
+        <h2 class="text-info mb-4 mt-5">Pricing and Player Engagement</h2>
+        <div class="row mb-5">
+
+            <div class="col-md-6 mb-4">
+                <h5>Top SteamSpy Tags by Price and Playtime</h5>
+                {{ pricing_vs_playtime_tags_chart | safe }}
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <h5>Top SteamSpy Tags by Price and Rating</h5>
+                {{ pricing_vs_rating_tags_chart | safe }}
+            </div>
+            <p class="text-light mb-4" style="font-size: 0.95rem;">
+                Note: The data is limited to games with available ratings and paid games only and each tag group includes a different set of games.
+            </p>
+
+            <div class="col-md-6 mb-4">
+                <h5> Free vs. Paid Games</h5>
+                {{ free_vs_paid_games_chart | safe }}
+            </div>
+
         </div>
+
     </div>
 {% endblock %}
