@@ -20,11 +20,11 @@
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                     <li><a href="{{ url_for('home') }}" class="nav-link px-2">Home</a></li>
                     <li><a href="{{ url_for('dashboard') }}" class="nav-link px-2">Dashboard</a></li>
-                    <li><a href="#" class="nav-link px-2">About</a></li>
+                    <li><a href="{{ url_for('about') }}" class="nav-link px-2">About</a></li>
                 </ul>
 
-                <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search"> 
-                    <input type="search" class="form-control form-control-dark text-light" placeholder="Search..." aria-label="Search"> 
+                <form method="POST" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" action="{{ url_for('home') }}"> 
+                    <input type="search" name="search" class="form-control form-control-dark text-light" placeholder="Search Games..." aria-label="Search"> 
                 </form>
             </div>
         </div>
@@ -39,7 +39,7 @@
             <ul class="nav justify-content-center border-bottom pb-3 mb-3">
                 <li class="nav-item"><a href="{{ url_for('home') }}" class="nav-link px-2">Home</a></li>
                 <li><a href="{{ url_for('dashboard') }}" class="nav-link px-2">Dashboard</a></li>
-                <li class="nav-item"><a href="#" class="nav-link px-2">About</a></li>
+                <li class="nav-item"><a href="{{ url_for('about') }}" class="nav-link px-2">About</a></li>
             </ul>
             <p class="text-center">© {{ current_year }} Game Explorer. Built by Heron.</p>
         </footer>

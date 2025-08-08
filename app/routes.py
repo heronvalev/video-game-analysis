@@ -289,3 +289,7 @@ def dashboard():
         achievements_vs_ratings_chart=achievements_vs_ratings_chart,
         games_per_year_chart=games_per_year_chart
     )
+
+@app.route("/about")
+def about():
+    return render_template("about.html", current_year=datetime.now().year)
