@@ -273,6 +273,8 @@ def dashboard():
     pricing_vs_playtime_tags_chart = pricing_vs_playtime_tag_chart(DB_PATH)
     pricing_vs_rating_tags_chart = pricing_vs_rating_tag_chart(DB_PATH)
     free_vs_paid_games_chart = free_vs_paid_chart(DB_PATH)
+    achievements_vs_ratings_chart = achievements_vs_rating_chart(DB_PATH)
+    games_per_year_chart = games_released_over_time_chart(DB_PATH)
 
     return render_template(
         "dashboard.html",
@@ -283,5 +285,7 @@ def dashboard():
         publishers_chart=publishers_chart,
         pricing_vs_playtime_tags_chart=pricing_vs_playtime_tags_chart,
         pricing_vs_rating_tags_chart=pricing_vs_rating_tags_chart,
-        free_vs_paid_games_chart=free_vs_paid_games_chart
+        free_vs_paid_games_chart=free_vs_paid_games_chart,
+        achievements_vs_ratings_chart=achievements_vs_ratings_chart,
+        games_per_year_chart=games_per_year_chart
     )

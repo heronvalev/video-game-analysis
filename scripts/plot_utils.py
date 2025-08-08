@@ -9,7 +9,7 @@ def top_genres_chart(db_path):
         db_path (str): Path to the SQLite database file.
 
     Returns:
-        str: HTML representation of the Plotly chart to embed in templates.
+        str: HTML representation of the Plotly chart.
     """
     # Connect to the SQLite database
     conn = sqlite3.connect(db_path)
@@ -64,7 +64,7 @@ def top_categories_chart(db_path):
         db_path (str): Path to the SQLite database file.
 
     Returns:
-        str: HTML representation of the Plotly chart to embed in templates.
+        str: HTML representation of the Plotly chart.
     """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -113,7 +113,7 @@ def top_steamspy_tags_chart(db_path):
         db_path (str): Path to the SQLite database file.
 
     Returns:
-        str: HTML representation of the Plotly chart to embed in templates.
+        str: HTML representation of the Plotly chart.
     """
 
     conn = sqlite3.connect(db_path)
@@ -164,7 +164,7 @@ def top_developers_chart(db_path):
         db_path (str): Path to the SQLite database file.
 
     Returns:
-        str: HTML representation of the Plotly chart to embed in templates.
+        str: HTML representation of the Plotly chart.
     """
 
     conn = sqlite3.connect(db_path)
@@ -214,7 +214,7 @@ def top_publishers_chart(db_path):
         db_path (str): Path to the SQLite database file.
 
     Returns:
-        str: HTML representation of the Plotly chart to embed in templates.
+        str: HTML representation of the Plotly chart.
     """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -263,7 +263,7 @@ def pricing_vs_playtime_tag_chart(db_path):
         db_path (str): Path to the SQLite database file.
 
     Returns:
-        str: HTML representation of the Plotly chart to embed in templates.
+        str: HTML representation of the Plotly chart.
     """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -298,7 +298,7 @@ def pricing_vs_playtime_tag_chart(db_path):
         x=tags,
         y=avg_prices,
         name="Avg Price (£)",
-        marker_color="orange",
+        marker_color="teal",
         yaxis="y1"
     ))
 
@@ -346,7 +346,7 @@ def pricing_vs_rating_tag_chart(db_path):
         db_path (str): Path to the SQLite database file.
 
     Returns:
-        str: HTML representation of the Plotly chart to embed in templates.
+        str: HTML representation of the Plotly chart.
     """
 
     conn = sqlite3.connect(db_path)
@@ -386,7 +386,7 @@ def pricing_vs_rating_tag_chart(db_path):
         x=tags,
         y=avg_prices,
         name="Avg Price (£)",
-        marker_color="orange",
+        marker_color="crimson",
         yaxis="y1"
     ))
 
@@ -428,7 +428,7 @@ def free_vs_paid_chart(db_path):
         db_path (str): Path to the SQLite database file.
 
     Returns:
-        str: HTML representation of the Plotly chart to embed in templates.
+        str: HTML representation of the Plotly chart.
     """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -453,7 +453,7 @@ def free_vs_paid_chart(db_path):
             labels=labels,
             values=counts,
             textinfo='percent+label',
-            marker=dict(line=dict(color='white', width=2))
+            marker=dict(colors=["#9b59b6", "#f1c40f"], line=dict(color='white', width=2))
         )
     )
 
@@ -462,4 +462,107 @@ def free_vs_paid_chart(db_path):
         template="plotly_dark",
         margin=dict(l=60, r=60, t=60, b=60)
     )
+    return fig.to_html(full_html=False)
+
+def achievements_vs_rating_chart(db_path):
+    """
+    Generate a bar chart showing average rating against availability of achievements.
+
+    Args:
+        db_path (str): Path to the SQLite database file.
+
+    Returns:
+        str: HTML representation of the Plotly chart.
+    """
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    query = """
+        SELECT 
+            CASE WHEN achievements > 0 THEN 'Has Achievements' ELSE 'No Achievements' END AS achievement_group,
+            AVG(CAST(positive_ratings AS FLOAT) / (positive_ratings + negative_ratings) * 100) AS avg_positive_rating_pct
+        FROM ratings
+        WHERE positive_ratings IS NOT NULL AND negative_ratings IS NOT NULL
+          AND (positive_ratings + negative_ratings) > 0
+        GROUP BY achievement_group
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    conn.close()
+
+    rating_map = {'Has Achievements': 0, 'No Achievements': 0}
+    for group, avg_rating in results:
+        rating_map[group] = avg_rating or 0
+
+    x = list(rating_map.keys())
+    y = [rating_map[x[0]], round(rating_map[x[1]])]
+
+    fig = go.Figure(data=[
+        go.Bar(
+            x=x,
+            y=y,
+            text=[f"{round(v)}%" for v in y],
+            textposition='outside',
+            marker_color=['#1f77b4', '#ff7f0e']
+        )
+    ])
+
+    fig.update_layout(
+        title='Average Positive Rating vs Achievements Availability',
+        yaxis_title='Average Positive Rating (%)',
+        yaxis_range=[0, 100],
+        template="plotly_dark",
+        showlegend=False
+    )
+
+    return fig.to_html(full_html=False)
+
+def games_released_over_time_chart(db_path):
+    """
+    Generate a line chart showing how many games were released each year.
+
+    Args:
+        db_path (str): Path to the SQLite database file.
+
+    Returns:
+        str: HTML representation of the Plotly chart.
+    """
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    query = """
+        SELECT 
+            STRFTIME('%Y', release_date) AS year,
+            COUNT(*) AS total_games
+        FROM games
+        WHERE release_date IS NOT NULL
+        GROUP BY year
+        ORDER BY year
+    """
+    cursor.execute(query)
+    results = cursor.fetchall()
+    conn.close()
+
+    years = [row[0] for row in results]
+    counts = [row[1] for row in results]
+
+    fig = go.Figure(data=[
+        go.Scatter(
+            x=years,
+            y=counts,
+            mode='lines+markers',
+            line=dict(shape='linear'),
+            marker=dict(size=6)
+        )
+    ])
+
+    fig.update_layout(
+        title='Number of Games Released Per Year',
+        xaxis_title='Year',
+        yaxis_title='Number of Games',
+        xaxis_tickangle=-45,
+        showlegend=False,
+        template="plotly_dark"
+    )
+
     return fig.to_html(full_html=False)

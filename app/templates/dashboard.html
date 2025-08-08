@@ -58,7 +58,7 @@
                 {{ pricing_vs_rating_tags_chart | safe }}
             </div>
             <p class="text-light mb-4" style="font-size: 0.95rem;">
-                Note: The data is limited to games with available ratings and paid games only and each tag group includes a different set of games.
+                Note: The data for the above two charts is limited to games with available ratings and paid games only and each tag group includes a different set of games.
             </p>
 
             <div class="col-md-6 mb-4">
@@ -66,7 +66,19 @@
                 {{ free_vs_paid_games_chart | safe }}
             </div>
 
+            <div class="col-md-6 mb-4">
+                <h5> Average Ratings against Achievements</h5>
+                {{ achievements_vs_ratings_chart | safe }}
+            </div>
+
         </div>
 
+        <hr class="divider-line">
+
+        <h2 class="text-info mb-4 mt-5">Games Released Over Time</h2>
+        <div class="row mb-5">
+            <h5> Games per Year</h5>
+                {{ games_per_year_chart | safe }}
+        </div>
     </div>
 {% endblock %}
