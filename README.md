@@ -28,3 +28,8 @@ This project uses data sourced from Kaggle (https://www.kaggle.com/datasets/nikd
 * Click on a game to see detailed information.
 * Browse by genre, category, platform, or tag using the links available on the game details page.
 * Use the dashboard to explore visual charts about the Steam games dataset.
+
+## Live Demo
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://video-game-analysis.onrender.com)
+
